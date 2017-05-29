@@ -14,11 +14,13 @@ class Response
 	 * Sets the status code of the response
 	 *
 	 * @param int The HTTP code
-	 * @return void
+	 * @return Response
 	 */
 	public function status($code)
 	{
 		http_response_code($code);
+
+		return $this;
 	}
 
 	/**
@@ -47,9 +49,9 @@ class Response
 			return;
 		}
 
-		foreach ($this->headers as $header)
+		foreach ($this->headers as $header => $content)
 		{
-			header($header);
+			header($header.': '.$content);
 		}
 	}
 

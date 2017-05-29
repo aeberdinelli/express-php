@@ -20,6 +20,7 @@ class Express
 	private $current;
 	private $method;
 	private $headers;
+	private $body;
 
 	/**
 	 * Gets the info of the current request
@@ -29,6 +30,27 @@ class Express
 		$this->current = $this->parse((isset($_GET['route'])) ? $_GET['route'] : '/');
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		$this->headers = apache_request_headers();
+
+		// Obtain the request body
+		switch ($this->method)
+		{
+			case 'POST':
+				$this->body = (object) $_POST;
+			break;
+			case 'PUT':
+				try
+				{
+					$this->body = json_decode(file_get_contents('php://input'));
+				}
+				catch (Exception $e)
+				{
+					throw new Exception("Failed to parse PUT body");
+					$this->body = (object) array();
+				}
+			break;
+			default:
+				$this->body = (object) array();
+		}
 	}
 
 	/**
@@ -104,7 +126,7 @@ class Express
 				$request = (object) array(
 					'params'	=> (object) $variables,
 					'headers'	=> $this->headers,
-					'body'		=> array()
+					'body'		=> $this->body
 				);
 
 				// Build the $next parameter
@@ -115,8 +137,11 @@ class Express
 					$next = $handlers[1];
 				}
 
+				// Build the response parameter
+				$response = new Response();
+
 				// Call the first handler
-				$handlers[0]($request, null, $next);
+				$handlers[0]($request, $response, $next);
 
 				// Stop handling this request
 				break;
