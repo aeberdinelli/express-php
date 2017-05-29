@@ -73,6 +73,11 @@ class Express
 
 		return $path;
 	}
+	
+	public function static($path)
+	{
+		return new ExpressStatic($path, $this->current);
+	}
 
 	/**
 	 * Make express-php handle the request.
