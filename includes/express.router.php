@@ -57,6 +57,11 @@ class Router
 		$this->use($route, $callback, $map);
 	}
 
+	public function delete($route, $callback = null, $map = 'DELETE')
+	{
+		$this->use($route, $callback, $map);
+	}
+
 	public function getRoutes()
 	{
 		return $this->map;
