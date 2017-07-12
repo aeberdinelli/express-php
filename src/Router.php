@@ -1,4 +1,6 @@
 <?php
+namespace Express;
+
 class Router
 {
 	private $map;
@@ -29,7 +31,7 @@ class Router
 					{
 						$this->map[$method][$path] = array();
 					}
-					
+
 					$this->map[$method][$path][] = $handler;
 				}
 			}
@@ -40,7 +42,7 @@ class Router
 		{
 			$callback->init($route);
 		}
-		
+
 		// Handle a call with a custom handler
 		else
 		{
