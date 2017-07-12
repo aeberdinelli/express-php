@@ -1,4 +1,6 @@
 <?php
+namespace Express;
+
 class Response
 {
 	private $sent;

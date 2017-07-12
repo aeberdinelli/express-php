@@ -1,4 +1,8 @@
 <?php
+namespace Express;
+
+use Express\ExpressStatic;
+
 /**
  * Regex to search for variable names when calling the ->use function in a Router
  *
@@ -25,7 +29,7 @@ class Express
 	/**
 	 * Gets the info of the current request
 	 */
-	public function __construct() 
+	public function __construct()
 	{
 		$this->current = $this->parse((isset($_GET['route'])) ? $_GET['route'] : '/');
 		$this->method = $_SERVER['REQUEST_METHOD'];
@@ -54,7 +58,7 @@ class Express
 	}
 
 	/**
-	 * A helper to make the updated we need to a path
+	 * A helper to make the updates we need to a path
 	 *
 	 * @param string The path to parse
 	 * @return string Valid path
@@ -73,7 +77,7 @@ class Express
 
 		return $path;
 	}
-	
+
 	public function static($path)
 	{
 		return new ExpressStatic($path, $this->current);
@@ -82,7 +86,7 @@ class Express
 	/**
 	 * Make express-php handle the request.
 	 *
-	 * @param Router An instance of Router (@see Router)
+	 * @param Router An instance of Router (@see \Express\Router)
 	 * @param function A function to call after the requests have been handled.
 	 * @return void
 	 */
@@ -111,7 +115,7 @@ class Express
 			}
 
 			// Build the regex to match the request
-			$regex = preg_replace(REGEX_VAR, REGEX_VAR_URL, $path);			
+			$regex = preg_replace(REGEX_VAR, REGEX_VAR_URL, $path);
 			$regex = str_replace('/', '\/', $regex);
 
 			if (preg_match('/^'.$regex.'$/', $this->current))
