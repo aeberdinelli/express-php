@@ -4,7 +4,13 @@ This framework tries to clone the NodeJS [express framework](https://www.npmjs.c
 ## Install
 **Note**: To run ExpressPHP you need PHP >= 7.0 and Apache.
 
-The preferred installation is using Composer: `composer require aeberdinelli/express-php v1.0.1`
+The preferred installation is using Composer: 
+
+`composer require aeberdinelli/express-php v1.0.1`
+
+Then, move the .htaccess to the root of your site and you're done:
+
+`mv vendor/aeberdinelli/express-php/.htaccess ./.htaccess`
 
 ## Usage
 If you installed using composer, you can just do:
