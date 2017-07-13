@@ -1,6 +1,7 @@
 <?php
 namespace Express;
 
+// Load template engines
 use Jade\Jade;
 
 /**
@@ -32,14 +33,11 @@ class Response
 
 		if (in_array($this->settings['view_engine'], array('jade','pug')))
 		{
-			try
-			{
-				$this->engine = new Jade($this->settings['cache_dir'], $this->settings['pretty_print']);
-			}
-			catch (Exception $e)
-			{
-				throw new \Exception("Could not instantiate template engine");
-			}
+			$this->engine = new Jade($this->settings['cache_dir'], $this->settings['pretty_print']);
+		}
+		elseif ($this->settings['view_engine'] == 'mustache')
+		{
+			$this->engine = new \Mustache_Engine();
 		}
 	}
 
@@ -96,6 +94,15 @@ class Response
 			throw new \Exception("The template ".$this->settings['views']."/".$path." does not exist");
 		}
 
+		// Path to the template file
+		$view = $this->settings['views'].'/'.$path;
+
+		// Mustache needs the actual content of the file, so fetch it
+		if ($this->settings['view_engine'] == 'mustache')
+		{
+			$view = file_get_contents($view);
+		}
+
 		if ($this->settings['allow_php'])
 		{
 			// A not so pretty little hack to send the variables to the view
@@ -103,11 +110,11 @@ class Response
 				$scope = json_decode(\''.json_encode($scope).'\', true);
 				extract($scope);
 				?>
-			'.$this->engine->render($this->settings['views'].'/'.$path, $scope));
+			'.$this->engine->render($view, $scope));
 		}
 		else
 		{
-			echo $this->engine->render($this->settings['views'].'/'.$path, $scope);
+			echo $this->engine->render($view, $scope);
 		}
 	}
 

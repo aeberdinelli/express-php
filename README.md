@@ -92,11 +92,14 @@ $router->use('/static', $express->static('views/public'));
 ```
 
 ## Template engines
-You have avaible [Pug](https://pugjs.org) (ex Jade). Here's an example:
+You have avaible [Pug](https://pugjs.org) (ex Jade) and [Mustache](https://mustache.github.io/). Here's an example:
 
 ```
-// Configure the engine
+// Configure the engine to Pug
 $express->set('view engine','pug');
+
+// Or Mustache
+$express->set('view engine','mustache');
 
 // Set the path to the template files
 $express->set('views','./views/pug');
