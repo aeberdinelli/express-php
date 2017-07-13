@@ -3,7 +3,7 @@ This framework tries to clone the NodeJS [express framework](https://www.npmjs.c
 If you wish to use this framework, please keep in mind that it's in early development. (PRs welcome)
 
 ## Install
-To use express-php, just clone this repo and start developing!
+To use express-php, just clone this repo and start developing! **Composer coming soon**.
 
 ## Routes
 Routes are handled using a Router instance, for example:
@@ -41,7 +41,7 @@ $router->post('/', function($req, $res) {
 		'error'		=> false,
 		'message'	=> 'Hello'
 	));
-})
+});
 ```
 
 You can also send a custom http response code using:
@@ -53,6 +53,32 @@ $router->post('/', function($req, $res) {
 		'message'	=> 'Created!'
 	});
 });
+```
+
+## Template engines
+You have avaible [Pug](https://pugjs.org) (ex Jade). Here's an example:
+
+```
+// Configure the engine
+$express->set('view engine','pug');
+
+// Set the path to the template files
+$express->set('views','./views/pug');
+
+// Now you can do something like this
+$router->get('/', function($req, $res) {
+	$res->render('index.jade');
+});
+
+// Or this
+$router->get('/users/:username', function($req, $res) {
+	$res->render('index.jade', array(
+		'name'	=> $req->params->username
+	);
+	
+	// Now in the template, you can use #{name} to get that variable!
+});
+
 ```
 
 For more examples, check the `index.php` file included in this repository.
