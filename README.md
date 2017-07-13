@@ -1,9 +1,31 @@
 # ExpressPHP
 This framework tries to clone the NodeJS [express framework](https://www.npmjs.com/package/express) functionality.
-If you wish to use this framework, please keep in mind that it's in early development. (PRs welcome)
 
 ## Install
-To use express-php, just clone this repo and start developing! **Composer coming soon**.
+**Note**: To run ExpressPHP you need PHP >= 7.0 and Apache.
+
+The preferred installation is using Composer: `composer require aeberdinelli/express-php v1.0.1`
+
+## Usage
+If you installed using composer, you can just do:
+
+```
+<?php
+include __DIR__.'/vendor/autoload.php';
+
+use Express\Express;
+use Express\Router;
+
+$express = new Express();
+$router = new Router();
+
+$router->get('/', function($req, $res) {
+	$res->send('hello world!');
+});
+
+$express->listen($router);
+?>
+```
 
 ## Routes
 Routes are handled using a Router instance, for example:
@@ -27,7 +49,7 @@ $router->get('/:something/:else', function($req, $res) {
      * Now let's imagine someone enters to URL: /hello/bye, then:
      *
      * $req->params->something will contain 'hello'
-     * $req->params->else will contain bye
+     * $req->params->else will contain 'bye'
      */
 });
 ```
@@ -75,13 +97,11 @@ $router->get('/users/:username', function($req, $res) {
 	$res->render('index.jade', array(
 		'name'	=> $req->params->username
 	));
-	
+
 	// Now in the template, you can use #{name} to get that variable!
 });
 
 ```
-
-For more examples, check the `index.php` file included in this repository.
 
 ## Request info
 - You have the body of the request in $res->body no matter if you re handling POST or PUT.
