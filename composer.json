@@ -14,5 +14,7 @@
 			"Jade\\": ["src/Jade/"]
 		}
 	},
-    "require": {}
+    "require": {
+        "mustache/mustache": "^2.12"
+	}
 }
