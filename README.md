@@ -77,6 +77,14 @@ $router->post('/', function($req, $res) {
 });
 ```
 
+## Static files
+If you wish to serve static files (likes images, html only) you can use:
+
+```
+// If you visit /static/image.png, this will return the file views/public/image.png
+$router->use('/static', $express->static('views/public'));
+```
+
 ## Template engines
 You have avaible [Pug](https://pugjs.org) (ex Jade). Here's an example:
 
