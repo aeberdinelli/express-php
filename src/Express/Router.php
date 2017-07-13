@@ -1,10 +1,24 @@
 <?php
 namespace Express;
 
+/**
+ * Generates the routing map to be handled
+ *
+ */
+
 class Router
 {
+	/**
+	 * An array containing the method, path and the list of handlers
+	 * @var array
+	 */
 	private $map;
 
+	/**
+	 * Constructor
+	 *
+	 * @return void
+	 */
 	public function __construct()
 	{
 		$this->map = array(
@@ -16,6 +30,14 @@ class Router
 		);
 	}
 
+	/**
+	 * Adds a handler for a route
+	 *
+	 * @param string The route to be handled
+	 * @param function The function to be executed when the route and method matches
+	 * @param string The method (POST, PUT, ...)
+	 * @return void
+	 */
 	public function use($route, $callback = null, $map = '*')
 	{
 		// Handle a call with a router
@@ -55,26 +77,59 @@ class Router
 		}
 	}
 
-	public function get($route, $callback = null, $map = 'GET')
+	/**
+	 * Adds a handler for a route in the GET method
+	 *
+	 * @param string The route to be handled
+	 * @param function The function to be executed when the route and method matches
+	 * @return void
+	 */
+	public function get($route, $callback = null)
 	{
-		$this->use($route, $callback, $map);
+		$this->use($route, $callback, 'GET');
 	}
 
-	public function post($route, $callback = null, $map = 'POST')
+	/**
+	 * Adds a handler for a route in the POST method
+	 *
+	 * @param string The route to be handled
+	 * @param function The function to be executed when the route and method matches
+	 * @return void
+	 */
+	public function post($route, $callback = null)
 	{
-		$this->use($route, $callback, $map);
+		$this->use($route, $callback, 'POST');
 	}
 
-	public function put($route, $callback = null, $map = 'PUT')
+	/**
+	 * Adds a handler for a route in the PUT method
+	 *
+	 * @param string The route to be handled
+	 * @param function The function to be executed when the route and method matches
+	 * @return void
+	 */
+	public function put($route, $callback = null)
 	{
-		$this->use($route, $callback, $map);
+		$this->use($route, $callback, 'PUT');
 	}
 
-	public function delete($route, $callback = null, $map = 'DELETE')
+	/**
+	 * Adds a handler for a route in the DELETE method
+	 *
+	 * @param string The route to be handled
+	 * @param function The function to be executed when the route and method matches
+	 * @return void
+	 */
+	public function delete($route, $callback = null)
 	{
-		$this->use($route, $callback, $map);
+		$this->use($route, $callback, 'DELETE');
 	}
 
+	/**
+	 * Returns the current mapping
+	 *
+	 * @return array
+	 */
 	public function getRoutes()
 	{
 		return $this->map;
