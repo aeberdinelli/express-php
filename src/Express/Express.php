@@ -21,10 +21,71 @@ const REGEX_VAR_URL = '([a-zA-Z0-9_\-@]+)/';
 
 class Express
 {
+	/**
+	 * The url we are handling (the value in the ?route querystring sent by htaccess)
+	 * @var string
+	 */
 	private $current;
+
+	/**
+	 * The method used in the current request
+	 * @var string
+	 */
 	private $method;
+
+	/**
+	 * The headers in the current request
+	 * @var array
+	 */
 	private $headers;
+
+	/**
+	 * The parsed body in the current request
+	 * @var array
+	 */
 	private $body;
+
+	/**
+	 * The default settings for ExpressPHP
+	 * @var array
+	 */
+	protected $settings = array(
+		/**
+		 * Default template engine
+		 * @var string
+		 */
+		'view_engine'	=> '',
+
+		/**
+		 * The path where the templates are
+		 * @var string
+		 */
+		'views'			=> '',
+
+		/**
+		 * Allow the execution of PHP within the templates?
+		 * @var boolean
+		 */
+		'allow_php'		=> true,
+
+		/**
+		 * Make the output of json pretty
+		 * @var boolean
+		 */
+		'pretty_json'	=> false,
+
+		/**
+		 * Make the templates render pretty
+		 * @var boolean
+		 */
+		'pretty_print'	=> false,
+
+		/**
+		 * Where the cache of templates should be
+		 * @var string
+		 */
+		'cache_dir'		=> '/tmp'
+	);
 
 	/**
 	 * Gets the info of the current request
@@ -58,6 +119,34 @@ class Express
 	}
 
 	/**
+	 * An alias for $this->setting()
+	 */
+	public function set($setting, $value)
+	{
+		return $this->setting($setting, $value);
+	}
+
+	/**
+	 * Gets or sets a setting
+	 *
+	 * @param string The variable name
+	 * @param string The value of the setting
+	 * @return string
+	 */
+	public function setting($setting, $value = '')
+	{
+		// View Engine -> view_engine
+		$setting = strtolower(str_replace(' ', '_', $setting));
+
+		if ($value != '')
+		{
+			$this->settings[$setting] = $value;
+		}
+
+		return $this->settings[$setting];
+	}
+
+	/**
 	 * A helper to make the updates we need to a path
 	 *
 	 * @param string The path to parse
@@ -78,6 +167,12 @@ class Express
 		return $path;
 	}
 
+	/**
+	 * Serve static files
+	 *
+	 * @param string The path where the files are
+	 * @return ExpressStatic a new instance
+	 */
 	public function static($path)
 	{
 		return new ExpressStatic($path, $this->current);
@@ -96,7 +191,7 @@ class Express
 
 		if (!isset($routes[$this->method]))
 		{
-			die('Could not handle '.$this->method);
+			throw new \Exception('Could not handle '.$this->method);
 		}
 
 		foreach (array_merge($routes['*'], $routes[$this->method]) as $path => $handlers)
@@ -139,6 +234,7 @@ class Express
 				);
 
 				// Build the $next parameter
+				// TODO: Support more than two handlers for the same route.
 				$next = function() {};
 
 				if (count($handlers) > 1)
@@ -147,7 +243,7 @@ class Express
 				}
 
 				// Build the response parameter
-				$response = new Response();
+				$response = new Response($this->settings);
 
 				// Call the first handler
 				$handlers[0]($request, $response, $next);
