@@ -41,9 +41,15 @@ class Express
 
 	/**
 	 * The parsed body in the current request
-	 * @var array
+	 * @var object
 	 */
 	private $body;
+
+	/**
+	 * The cookies in this request
+	 * @var object
+	 */
+	private $cookies;
 
 	/**
 	 * The default settings for ExpressPHP
@@ -95,6 +101,7 @@ class Express
 		$this->current = $this->parse((isset($_GET['route'])) ? $_GET['route'] : '/');
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		$this->headers = apache_request_headers();
+		$this->cookies = (object) $_COOKIE;
 
 		// Obtain the request body
 		switch ($this->method)
@@ -109,7 +116,7 @@ class Express
 				}
 				catch (Exception $e)
 				{
-					throw new Exception("Failed to parse PUT body");
+					throw new \Exception("Failed to parse PUT body");
 					$this->body = (object) array();
 				}
 			break;
@@ -230,6 +237,7 @@ class Express
 				$request = (object) array(
 					'params'	=> (object) $variables,
 					'headers'	=> $this->headers,
+					'cookies'	=> $this->cookies,
 					'body'		=> $this->body
 				);
 

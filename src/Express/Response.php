@@ -10,13 +10,27 @@ use Jade\Jade;
 
 class Response
 {
-	private $sent;
+	/**
+	 * An array of headers to be sent
+	 * @var array
+	 */
 	private $headers;
+
+	/**
+	 * The settings of the instance
+	 * @var array
+	 */
 	private $settings;
 
 	/**
-	 * An instance of the view engine (for now only Jade supported)
+	 * Have we sent cookies in this response?
+	 * @var boolean
 	 */
+	private $cookies = false;
+
+	/**
+	* An instance of the view engine
+	*/
 	private $engine;
 
 	/**
@@ -27,7 +41,6 @@ class Response
 	 */
 	public function __construct($settings = array())
 	{
-		$this->sent = false;
 		$this->headers = array();
 		$this->settings = $settings;
 
@@ -76,6 +89,87 @@ class Response
 	}
 
 	/**
+	 * A bind for the setcookie PHP func. This allows using only some parameters and not in order.
+	 *
+	 * @param string Name of the cookie
+	 * @param string Value of the cookie
+	 * @param array Cookie options
+	 * @return void
+	 */
+	public function cookie($name, $value, $options = array())
+	{
+		$this->cookies = true;
+
+		// If not defined, create the cookie for this session
+		$expire = 0;
+
+		// Use the root of the app as a default path
+		$path = '/';
+
+		// Domain of the cookie
+		$domain = '';
+
+		// Transmit only with https?
+		$secure = false;
+
+		// Prevent js from accesing the cookie
+		$httpOnly = false;
+
+		// Replace the settings with the options received
+		if (!empty($options))
+		{
+			extract($options);
+		}
+
+		setcookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
+	}
+
+	/**
+	 * Removes a cookie
+	 *
+	 * @param string Name of the cookie
+	 * @return void
+	 */
+	public function clearCookie($name, $settings = array())
+	{
+		/**
+		 * For more info about $settings
+		 * @see $this->cookie()
+		 */
+		$settings['expire'] = time()-60*60*24*365;
+
+		$this->cookie($name, '', $settings);
+	}
+
+	/**
+	 * Sends an attachment to force the download of a file
+	 *
+	 * @param string Path to the file
+	 * @param string Name of the file
+	 * @return void
+	 */
+	public function download($path, $name = '')
+	{
+		// Clear the existing headers
+		$this->headers = array(
+			'Content-Type'				=> 'application/octet-stream',
+			'Content-Transfer-Encoding'	=> 'Binary',
+			'Content-disposition'		=> 'attachment'
+		);
+
+		if ($name != '')
+		{
+			$this->header('Content-disposition', 'attachment; filename="'.$name.'"');
+		}
+
+		// Send headers
+		$this->headers();
+
+		// Send content
+		die(readfile($path));
+	}
+
+	/**
 	 * Render a template using the configured view engine
 	 *
 	 * @param string Path of the template
@@ -119,13 +213,44 @@ class Response
 	}
 
 	/**
+	 * Redirects to a location using Location header
+	 *
+	 * @param string URL
+	 * @return void
+	 */
+	public function location($url)
+	{
+		header('Location: '. $url);
+
+		// Stop once redirected
+		exit;
+	}
+
+	/**
+	 * Redirects to a location using a http redirect
+	 *
+	 * @param string URL
+	 * @param bool Is a permanent redirect?
+	 * @return void
+	 */
+	public function redirect($url, $permanent = false)
+	{
+		$code = ($permanent) ? 301 : 302;
+
+		header('Location: '.$url, true, $code);
+
+		// Stop once redirected
+		exit;
+	}
+
+	/**
 	 * Send the response headers
 	 *
 	 * @return void
 	 */
 	private function headers()
 	{
-		if (headers_sent())
+		if (headers_sent() && !$this->cookies)
 		{
 			return;
 		}
