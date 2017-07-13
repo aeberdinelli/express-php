@@ -10,7 +10,8 @@
     ],
 	"autoload": {
 		"psr-4": {
-			"Express\\": ["src/"]
+			"Express\\": ["src/Express/"],
+			"Jade\\": ["src/Jade/"]
 		}
 	},
     "require": {}
