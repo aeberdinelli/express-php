@@ -74,7 +74,7 @@ $router->get('/', function($req, $res) {
 $router->get('/users/:username', function($req, $res) {
 	$res->render('index.jade', array(
 		'name'	=> $req->params->username
-	);
+	));
 	
 	// Now in the template, you can use #{name} to get that variable!
 });
