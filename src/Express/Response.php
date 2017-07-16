@@ -29,6 +29,12 @@ class Response
 	private $cookies = false;
 
 	/**
+	 * Variables avaible within the entire instance (@see \Express\Express)
+	 * @var stdClass
+	 */
+	private $locals;
+
+	/**
 	* An instance of the view engine
 	*/
 	private $engine;
@@ -37,12 +43,18 @@ class Response
 	 * Constructor
 	 *
 	 * @param array The default express settings
+	 * @param stdClass An object with the app locals (@see \Express\Express)
 	 * @return void
 	 */
-	public function __construct($settings = array())
+	public function __construct($settings = array(), $locals = null)
 	{
 		$this->headers = array();
 		$this->settings = $settings;
+
+		if (!$locals)
+		{
+			$this->locals = new \stdClass;
+		}
 
 		if (in_array($this->settings['view_engine'], array('jade','pug')))
 		{
@@ -202,7 +214,9 @@ class Response
 			// A not so pretty little hack to send the variables to the view
 			eval('
 				$scope = json_decode(\''.json_encode($scope).'\', true);
+				$locals = json_decode(\''.json_encode($this->locals).'\', true);
 				extract($scope);
+				extract($locals);
 				?>
 			'.$this->engine->render($view, $scope));
 		}

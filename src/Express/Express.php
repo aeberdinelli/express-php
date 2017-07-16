@@ -52,6 +52,18 @@ class Express
 	private $cookies;
 
 	/**
+	 * The querystring of this request
+	 * @var array
+	 */
+	private $query;
+
+	/**
+	 * Variables avaible within the entire instance and avaible in the template views
+	 * @var stdClass
+	 */
+	public $locals;
+
+	/**
 	 * The default settings for ExpressPHP
 	 * @var array
 	 */
@@ -102,6 +114,13 @@ class Express
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		$this->headers = apache_request_headers();
 		$this->cookies = (object) $_COOKIE;
+		$this->locals = new \stdClass;
+
+		// Get the querystring, remove the route from it
+		parse_str($_SERVER['QUERY_STRING'], $result);
+		unset($result['route']);
+
+		$this->query = (object) $result;
 
 		// Obtain the request body
 		switch ($this->method)
@@ -123,6 +142,32 @@ class Express
 			default:
 				$this->body = (object) array();
 		}
+	}
+
+	/**
+	 * Gets the collected info
+	 *
+	 * @param bool Return the results instead of dump
+	 * @return mixed
+	 */
+	public function getInfo($return = false)
+	{
+		$info = array(
+			'QueryString'		=> $_SERVER['QUERY_STRING'],
+			'ParsedQueryString'	=> $this->query,
+			'ParsedURL'			=> $this->current,
+			'Headers'			=> $this->headers,
+			'Cookies'			=> $this->cookies,
+			'Body'				=> $this->body,
+			'PHPVersion'		=> phpversion()
+		);
+
+		if ($return)
+		{
+			return $info;
+		}
+
+		var_dump($info);
 	}
 
 	/**
@@ -237,6 +282,7 @@ class Express
 				$request = (object) array(
 					'params'	=> (object) $variables,
 					'headers'	=> $this->headers,
+					'query'		=> $this->query,
 					'cookies'	=> $this->cookies,
 					'body'		=> $this->body
 				);

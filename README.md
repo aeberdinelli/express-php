@@ -1,12 +1,12 @@
 # ExpressPHP
-This framework tries to clone the NodeJS [express framework](https://www.npmjs.com/package/express) functionality.
+This framework tries to clone the NodeJS [ExpressJS framework](https://www.npmjs.com/package/express) functionality.
 
 ## Install
 **Note**: To run ExpressPHP you need PHP >= 7.0 and Apache.
 
-The preferred installation is using Composer: 
+The preferred installation is using Composer:
 
-`composer require aeberdinelli/express-php v1.0.1`
+`composer require aeberdinelli/express-php v1.0.3`
 
 Then, move the .htaccess to the root of your site and you're done:
 
@@ -43,7 +43,7 @@ $router->get('/', function($req, $res) {
 });
 ```
 
-You can handle post requests as well using post() instead of get().
+You can handle post requests as well using post() instead of get(). Same for put() and delete().
 
 ## Route with dynamic parameters
 You can route dynamic URL using parameters, for example:
@@ -83,6 +83,8 @@ $router->post('/', function($req, $res) {
 });
 ```
 
+**TIP**: There are a few more examples in the `index.php` file in this repository.
+
 ## Static files
 If you wish to serve static files (likes images, html only) you can use:
 
@@ -97,6 +99,9 @@ You have avaible [Pug](https://pugjs.org) (ex Jade) and [Mustache](https://musta
 ```
 // Configure the engine to Pug
 $express->set('view engine','pug');
+
+// Jade was renamed to Pug, but we recognize it ;)
+$express->set('view engine','jade');
 
 // Or Mustache
 $express->set('view engine','mustache');
@@ -115,11 +120,13 @@ $router->get('/users/:username', function($req, $res) {
 		'name'	=> $req->params->username
 	));
 
-	// Now in the template, you can use #{name} to get that variable!
+	// Now in jade, you can use #{name} to get that variable!
 });
 
 ```
 
 ## Request info
 - You have the body of the request in $res->body no matter if you re handling POST or PUT.
+- You have the query string under $req->query
+- You have the cookies in $req->cookies
 - You have all the request headers in $req->headers
