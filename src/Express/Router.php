@@ -1,6 +1,8 @@
 <?php
 namespace Express;
 
+use Express\ExpressStatic;
+
 /**
  * Generates the routing map to be handled
  *
@@ -41,7 +43,7 @@ class Router
 	public function use($route, $callback = null, $map = '*')
 	{
 		// Handle a call with a router
-		if (is_a($callback, 'Router'))
+		if ($callback instanceof Router)
 		{
 			$routes = $callback->getRoutes();
 
@@ -49,18 +51,25 @@ class Router
 			{
 				foreach ($handlers as $path => $handler)
 				{
+					$path = $route.$path;
+
 					if (!isset($this->map[$method][$path]))
 					{
 						$this->map[$method][$path] = array();
 					}
 
-					$this->map[$method][$path][] = $handler;
+					if (!is_array($handler))
+					{
+						$handler = array($handler);
+					}
+
+					$this->map[$method][$path] = array_merge($this->map[$method][$path], $handler);
 				}
 			}
 		}
 
 		// Handle static files
-		elseif (is_a($callback, 'ExpressStatic'))
+		elseif ($callback instanceof ExpressStatic)
 		{
 			$callback->init($route);
 		}
