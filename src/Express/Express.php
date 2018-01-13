@@ -126,7 +126,17 @@ class Express
 		switch ($this->method)
 		{
 			case 'POST':
-				$this->body = (object) $_POST;
+				// TODO: Better check for POST data
+				if (count($_POST) > 0)
+				{
+					// Classic POST
+					$this->body = (object) $_POST;
+				}
+				else
+				{
+					// JSON POST
+					$this->body = json_decode(file_get_contents('php://input'));
+				}
 			break;
 			case 'PUT':
 				try
@@ -268,8 +278,7 @@ class Express
 			if (preg_match('/^'.$regex.'$/', $this->current))
 			{
 				// Get a list of the expected vars content
-				$var_regex = '/'.str_replace('/','\/', REGEX_VAR_URL).'/';
-				preg_match_all($var_regex, $this->current, $body_result, PREG_PATTERN_ORDER);
+				preg_match_all('/^'.$regex.'$/', $this->current, $body_result, PREG_PATTERN_ORDER);
 
 				$i = 0;
 				foreach ($variables as $name => $content)
