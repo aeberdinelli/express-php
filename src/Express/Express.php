@@ -176,8 +176,6 @@ class Express
 		{
 			return $info;
 		}
-
-		var_dump($info);
 	}
 
 	/**
@@ -278,13 +276,16 @@ class Express
 			if (preg_match('/^'.$regex.'$/', $this->current))
 			{
 				// Get a list of the expected vars content
-				preg_match_all('/^'.$regex.'$/', $this->current, $body_result, PREG_PATTERN_ORDER);
+				preg_match_all('/^'.$regex.'$/', $this->current, $body_result, PREG_SET_ORDER);
 
-				$i = 0;
+				$i = 1;
 				foreach ($variables as $name => $content)
 				{
-					$variables[$name] = $body_result[1][$i];
-					$i++;
+					if (!empty($body_result[0][$i]))
+					{
+						$variables[$name] = $body_result[0][$i];
+						$i++;
+					}
 				}
 
 				// Build the $request parameter
