@@ -125,6 +125,28 @@ $router->get('/users/:username', function($req, $res) {
 
 ```
 
+## CSS Precompilers
+You can use Less instead of CSS if you want. An example:
+
+```
+use \Express\ExpressLess;
+
+/**
+ * Let's say you have a /less folder on your project
+ * And you want every request that goes into /css to load the less file within that folder instead
+ *
+ * In this example /css/global.css will load the compiled version of /less/global.less
+ * Same for /css/something.css -> /less/something.less
+ */
+
+$less = new ExpressLess($express, array(
+	'source'	=> __DIR__.'/less',
+	'dest'		=> '/css'
+));
+
+// Yes, it's that simple.
+```
+
 ## Request info
 - You have the body of the request in $res->body no matter if you re handling POST or PUT.
 - You have the query string under $req->query

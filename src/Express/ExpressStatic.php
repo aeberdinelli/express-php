@@ -730,7 +730,7 @@ class ExpressStatic
 	 * @param string Route
 	 * @return bool
 	 */
-	private function isFile($route)
+	public function isFile($route)
 	{
 		return preg_match(self::REGEX_FILE, $route);
 	}
@@ -742,9 +742,9 @@ class ExpressStatic
 	 * @param string Route
 	 * @return string
 	 */
-	private function getType(string $path)
+	public static function getType(string $path)
 	{
-		$ext = '.'.strtolower($this->getExtension($path));
+		$ext = '.'.strtolower(self::getExtension($path));
 
 		if (isset(self::MIME_TYPES[$ext]))
 		{
@@ -755,7 +755,7 @@ class ExpressStatic
 		return 'application/octet-stream';
 	}
 
-	private function getExtension(string $file)
+	public static function getExtension(string $file)
 	{
 		return pathinfo($file, PATHINFO_EXTENSION);
 	}
@@ -783,7 +783,7 @@ class ExpressStatic
 		{
 			$path = $this->normalize($this->path.$this->parse($route, true));
 
-			header('Content-Type: '.$this->getType($path));
+			header('Content-Type: '.self::getType($path));
 
 			if (file_exists($path))
 			{

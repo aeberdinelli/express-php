@@ -15,6 +15,7 @@
 		}
 	},
     "require": {
-        "mustache/mustache": "^2.12"
+        "mustache/mustache": "^2.12",
+        "oyejorge/less.php": "~1.7.0.9"
 	}
 }
