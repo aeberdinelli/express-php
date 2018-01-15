@@ -322,5 +322,17 @@ class Express
 			$callback();
 		}
 	}
+
+	/**
+	 * Check if client supports json
+	 *
+	 * @return bool
+	 */
+	public static function supportsJSON()
+	{
+		$headers = apache_request_headers();
+
+		return (isset($headers['Accept']) && strpos($headers['Accept'], 'application/json') > -1);
+	}
 }
 ?>

@@ -35,9 +35,15 @@ class Response
 	private $locals;
 
 	/**
-	* An instance of the view engine
-	*/
+	 * An instance of the view engine
+	 */
 	private $engine;
+
+	/**
+	 * Regex to check if the file has the view extension
+	 * @var string
+	 */
+	const REGEX_EXT = '/\.(mustache|pug|jade)$/i';
 
 	/**
 	 * Constructor
@@ -188,20 +194,15 @@ class Response
 	 * @param array Variables to be put into the view
 	 * @return void
 	 */
-	public function render($path, $scope = array())
+	public function render($path, $scope = array(), $return = false)
 	{
 		if ($this->settings['view_engine'] == '')
 		{
 			throw new \Exception("There is no engine configured for this view");
 		}
 
-		if (!file_exists($this->settings['views'].'/'.$path))
-		{
-			throw new \Exception("The template ".$this->settings['views']."/".$path." does not exist");
-		}
-
 		// Path to the template file
-		$view = $this->settings['views'].'/'.$path;
+		$view = $this->solvePath($this->settings['views'].'/'.$path);
 
 		// Mustache needs the actual content of the file, so fetch it
 		if ($this->settings['view_engine'] == 'mustache')
@@ -211,19 +212,126 @@ class Response
 
 		if ($this->settings['allow_php'])
 		{
-			// A not so pretty little hack to send the variables to the view
-			eval('
-				$scope = json_decode(\''.json_encode($scope).'\', true);
-				$locals = json_decode(\''.json_encode($this->locals).'\', true);
-				extract($scope);
-				extract($locals);
-				?>
-			'.$this->engine->render($view, $scope));
+			$code = $this->declare($scope).'?>'.$this->engine->render($view, $scope);
+
+			if ($return)
+			{
+				return $code;
+			}
+
+			eval($code);
 		}
 		else
 		{
-			echo $this->engine->render($view, $scope);
+			$code = $this->engine->render($view, $scope);
+
+			if ($return)
+			{
+				return $code;
+			}
+
+			echo $code;
 		}
+
+		// Stop everything else
+		exit;
+	}
+
+	/**
+	 * Declare the variables inside the view
+	 *
+	 * @param array $variables Variables to declare
+	 * @param bool $in_array Are we inside an array?
+	 * @param int $tabs How many tabs should we use?
+	 * @return string
+	 */
+	private function declare($variables, $in_array = false, $tabs = 1)
+	{
+		$code = "\n";
+
+		$assign	= ($in_array) ? '=>' : '=';
+		$sign	= ($in_array) ? '' : '$';
+		$next	= ($in_array) ? ',' : ';';
+		$tab	= ($in_array) ? str_repeat("\t", $tabs) : "\t";
+
+		foreach ($variables as $name => $value)
+		{
+			$quotes	= ($in_array && is_string($name)) ? '"' : '';
+			$code .= $tab;
+
+			if ($in_array)
+			{
+				if (!is_numeric($name))
+				{
+					$code .= '"'.$name.'" => ';
+				}
+			}
+			else
+			{
+				$code .= '$'.$name.' = ';
+			}
+
+			switch (gettype($value))
+			{
+				case 'string':
+					$code .= '"'.addslashes($value).'"'.$next."\n";
+				break;
+				case 'array':
+					$code .= ' array('.$this->declare($value, true, $tabs + 1)."\n".str_repeat("\t", $tabs).')'.$next."\n";
+				break;
+				case 'boolean':
+					$code .= (($value) ? 'true' : 'false').$next."\n";
+				break;
+				default:
+					$code .= $value.$next."\n";
+			}
+		}
+
+		return $code;
+	}
+
+	/**
+	 * A helper to add the view extension if needed
+	 */
+	public function solvePath(string $path)
+	{
+		$engine = $this->settings['view_engine'];
+
+		// File already has an extension
+		if (preg_match(self::REGEX_EXT, $path))
+		{
+			if (!file_exists($path))
+			{
+				throw new \Exception("The template {$path} does not exist");
+			}
+
+			return $path;
+		}
+
+		// Pug
+		if (in_array($engine, array('jade','pug')))
+		{
+			if (file_exists($path.'.jade'))
+			{
+				$path .= '.jade';
+			}
+			elseif (file_exists($path.'.pug'))
+			{
+				$path .= '.pug';
+			}
+			else
+			{
+				throw new \Exception("The template {$path} does not exist");
+			}
+		}
+
+		// Mustache
+		elseif ($engine == 'mustache')
+		{
+			$path .= '.mustache';
+		}
+
+		return $path;
 	}
 
 	/**
