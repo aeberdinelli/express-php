@@ -277,12 +277,18 @@ class Response
 					$code .= '"'.addslashes($value).'"'.$next."\n";
 				break;
 				case 'array':
-					$code .= ' array('.$this->declare($value, true, $tabs + 1)."\n".str_repeat("\t", $tabs).')'.$next."\n";
+					$code .= ' array('.str_replace(",\n/*end array*/", "", $this->declare($value, true, $tabs + 1)."/*end array*/\n").str_repeat("\t", $tabs).')'.$next."\n";
 				break;
 				case 'boolean':
 					$code .= (($value) ? 'true' : 'false').$next."\n";
 				break;
 				default:
+					// Use an empty string by default
+					if (empty($value))
+					{
+						$value = '""';
+					}
+					
 					$code .= $value.$next."\n";
 			}
 		}

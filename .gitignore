@@ -1,2 +1,4 @@
 /vendor/
 .htaccess
+composer.lock
+.gitignore

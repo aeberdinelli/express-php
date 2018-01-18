@@ -667,7 +667,7 @@ class ExpressStatic
 		'.zip' => 'application/zip',
 		'.zip' => 'multipart/x-zip',
 		'.zoo' => 'application/octet-stream',
-		'.zsh' => 'text/x-script.zsh'
+		'.zsh' => 'text/x-script.zsh)'
 	);
 
 	/**
@@ -768,7 +768,13 @@ class ExpressStatic
 	 */
 	private function normalize($path)
 	{
-		return str_replace('/', DIRECTORY_SEPARATOR, $path);
+		// Replace / with \ if windows
+		$path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
+		// Since we are looking a static file, remove the trailing /
+		$path = preg_replace('/\/$/', '', $path);
+
+		return $path;
 	}
 
 	/**
@@ -790,7 +796,13 @@ class ExpressStatic
 				die(file_get_contents($path));
 			}
 
-			// Not Found
+			throw new \Exception(
+				sprintf(
+					"Could not handle %s. File %s not found", 
+					addslashes($this->current), 
+					addslashes($path)
+				)
+			);
 		}
 	}
 }
