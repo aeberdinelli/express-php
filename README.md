@@ -15,7 +15,7 @@ Then, move the .htaccess to the root of your site and you're done:
 ## Usage
 If you installed using composer, you can just do:
 
-```
+```php
 <?php
 include __DIR__.'/vendor/autoload.php';
 
@@ -36,7 +36,7 @@ $express->listen($router);
 ## Routes
 Routes are handled using a Router instance, for example:
 
-```
+```php
 $router = new Router();
 $router->get('/', function($req, $res) {
     // This will be called when someone goes to the main page using GET method.
@@ -48,7 +48,7 @@ You can handle post requests as well using post() instead of get(). Same for put
 ## Route with dynamic parameters
 You can route dynamic URL using parameters, for example:
 
-```
+```php
 $router = new Router();
 $router->get('/:something/:else', function($req, $res) {
     /**
@@ -63,7 +63,7 @@ $router->get('/:something/:else', function($req, $res) {
 ## Responses
 If you're developing an API for example, you can send json simply doing:
 
-```
+```php
 $router->post('/', function($req, $res) {
 	$res->json(array(
 		'error'		=> false,
@@ -74,7 +74,7 @@ $router->post('/', function($req, $res) {
 
 You can also send a custom http response code using:
 
-```
+```php
 $router->post('/', function($req, $res) {
 	$res->status(201)->json({
 		'error'		=> false,
@@ -88,7 +88,7 @@ $router->post('/', function($req, $res) {
 ## Static files
 If you wish to serve static files (likes images, html only) you can use:
 
-```
+```php
 // If you visit /static/image.png, this will return the file views/public/image.png
 $router->use('/static', $express->static('views/public'));
 ```
@@ -96,7 +96,7 @@ $router->use('/static', $express->static('views/public'));
 ## Template engines
 You have avaible [Pug](https://pugjs.org) (ex Jade) and [Mustache](https://mustache.github.io/). Here's an example:
 
-```
+```php
 // Configure the engine to Pug
 $express->set('view engine','pug');
 
@@ -128,7 +128,7 @@ $router->get('/users/:username', function($req, $res) {
 ## CSS Precompilers
 You can use Less instead of CSS if you want. An example:
 
-```
+```php
 use \Express\ExpressLess;
 
 /**
