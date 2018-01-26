@@ -409,6 +409,8 @@ class Response
 	 */
 	public function send($body)
 	{
+		$this->headers();
+		
 		echo $body;
 	}
 }

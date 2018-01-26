@@ -64,6 +64,12 @@ class Express
 	public $locals;
 
 	/**
+	 * A list of middlewares (aka pending Router instances)
+	 * @var array
+	 */
+	protected $middlewares = array();
+
+	/**
 	 * The default settings for ExpressPHP
 	 * @var array
 	 */
@@ -155,6 +161,17 @@ class Express
 	}
 
 	/**
+	 * Plug-in a middleware (Router)
+	 *
+	 * @param Router $router An \Express\Router instance
+	 * @return void
+	 */
+	public function use($middleware)
+	{
+		$this->middlewares[] = $middleware;
+	}
+
+	/**
 	 * Gets the collected info
 	 *
 	 * @param bool Return the results instead of dump
@@ -203,7 +220,7 @@ class Express
 			$this->settings[$setting] = $value;
 		}
 
-		return $this->settings[$setting];
+		return (isset($this->settings[$setting])) ? $this->settings[$setting] : false;
 	}
 
 	/**
@@ -247,8 +264,15 @@ class Express
 	 */
 	public function listen($router, $callback = null)
 	{
-		$routes = $router->getRoutes();
+		// Prepare middlewares routes
+		foreach ($this->middlewares as $middleware)
+		{
+			$router->use('', $middleware);
+		}
 
+		// Get routes from main router
+		$routes = $router->getRoutes();
+		
 		if (!isset($routes[$this->method]))
 		{
 			throw new \Exception('Could not handle '.$this->method);
@@ -290,6 +314,8 @@ class Express
 
 				// Build the $request parameter
 				$request = (object) array(
+					'settings'	=> $this->settings,
+					'path'		=> $this->current,
 					'params'	=> (object) $variables,
 					'headers'	=> $this->headers,
 					'query'		=> $this->query,
