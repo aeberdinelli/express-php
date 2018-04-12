@@ -6,7 +6,7 @@ This framework tries to clone the NodeJS [ExpressJS framework](https://www.npmjs
 
 The preferred installation is using Composer:
 
-`composer require aeberdinelli/express-php v1.0.3`
+`composer require aeberdinelli/express-php v1.1.0`
 
 Then, move the .htaccess to the root of your site and you're done:
 
