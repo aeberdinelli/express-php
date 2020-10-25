@@ -1,5 +1,5 @@
 # ExpressPHP
-This framework tries to clone the NodeJS [ExpressJS framework](https://www.npmjs.com/package/express) writing style.
+This framework tries to clone the NodeJS [ExpressJS framework](https://www.npmjs.com/package/express) writing style. It does not have an event loop, it just mimics the method and helpers names that ExpressJS offers.
 
 ## Install
 **Note**: To run ExpressPHP you need PHP >= 7.0 and Apache.
